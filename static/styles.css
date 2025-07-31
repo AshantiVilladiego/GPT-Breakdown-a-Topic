@@ -1,0 +1,157 @@
+    body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at center, #f8e2d4 0%, #d4e2f8 100%);
+    overflow: auto;
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 1.5s ease-in 0.2s forwards;
+    }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+
+h1 {
+    margin-top: 40px;
+    color: #333;
+}
+
+form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input[type="text"] {
+    width: 300px;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 18px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+h2 {
+    margin-top: 40px;
+    color: #333;
+}
+
+p {
+    width: 60%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    color: #444;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+strong {
+    font-weight: bold;
+    color: #000000;
+    font-family: 'Inter';
+    align-items: center;
+}
+
+
+.export-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+a {
+    margin-top: 20px;
+    display: inline-block;
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* 🧩 Added styles for structured explanation formatting */
+#explanation h3, #explanation h4 {
+    color: #333;
+    margin-top: 20px;
+}
+
+#explanation ul {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+#explanation li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+#explanation em {
+    display: block;
+    font-style: italic;
+    font-size: 18px;
+    margin-top: 20px;
+    color: #444;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.2);        /* semi-transparent white */
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);    /* soft shadow */
+    backdrop-filter: blur(10px);                 /* blur the background */
+    -webkit-backdrop-filter: blur(10px);         /* for Safari */
+    border: 1px solid rgba(255, 255, 255, 0.3);   /* subtle border */
+    padding: 2rem;
+    margin: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+input::placeholder {
+  font-family: 'Inter';
+  font-size: 14px; /* optional */
+  color: #000000;     /* optional */
+  font-style: italic;
+}
+
+
+.highlight {
+    font-size: xx-large;
+    font: display 100px;
+    font-style: bold;
+    font-family: 'Inter';
+
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Topic Breakdown GPT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+</style>
+
+
+</head>
+<body>
+    <h1>Want to breakdown a topic?</h1>
+    <form method="POST">
+      <input type="text" name="topic" placeholder="Enter a topic..." required>
+        <button type="submit">Submit</button>
+    </div>
+    </form>
+
+    {% if explanation %}
+    <h2>Explanation:</h2>
+    <p id="explanation" class="glass">{{ explanation | safe }}</p>
+    <div class="export-buttons">
+        <button id="exportBtn">Export to PDF</button>
+        <button id="saveBtn">Save to File</button>
+        </div>
+        {% endif %}
+
+
+
+    <script>
+        document.getElementById("exportBtn")?.addEventListener("click", function () {
+            const explanationText = document.getElementById("explanation").innerText;
+            const doc = new window.jspdf.jsPDF();
+            doc.text(explanationText, 10, 10);
+            doc.save("explanation.pdf");
+        });
+
+        document.getElementById("saveBtn")?.addEventListener("click", function () {
+            const text = document.getElementById("explanation").innerText;
+            const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "explanation.txt";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+    </script>
+
+    <!-- Include jsPDF if not already included -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
