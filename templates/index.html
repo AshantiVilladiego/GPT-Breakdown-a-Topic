@@ -12,43 +12,23 @@
 </head>
 <body>
     <h1>Want to breakdown a topic?</h1>
-    <form method="POST">
-      <input type="text" name="topic" placeholder="Enter a topic..." required>
+    <form method="POST", class="ai-form">
+        <input type="text" name="topic" placeholder="Enter a topic..." class="input-text" required>
+    <label for="provider">Select AI Provider:</label>
+  <select name="provider" required>
+    <option value="openai" {% if provider == "openai" %}selected{% endif %}>OpenAI</option>
+    <option value="gemini" {% if provider == "gemini" %}selected{% endif %}>Gemini</option>
+    <option value="huggingface" {% if provider == "huggingface" %}selected{% endif %}>Hugging Face</option>
+  </select>
         <button type="submit">Submit</button>
-    </div>
     </form>
 
     {% if explanation %}
     <h2>Explanation:</h2>
     <p id="explanation" class="glass">{{ explanation | safe }}</p>
-    <div class="export-buttons">
-        <button id="exportBtn">Export to PDF</button>
-        <button id="saveBtn">Save to File</button>
-        </div>
         {% endif %}
 
 
-
-    <script>
-        document.getElementById("exportBtn")?.addEventListener("click", function () {
-            const explanationText = document.getElementById("explanation").innerText;
-            const doc = new window.jspdf.jsPDF();
-            doc.text(explanationText, 10, 10);
-            doc.save("explanation.pdf");
-        });
-
-        document.getElementById("saveBtn")?.addEventListener("click", function () {
-            const text = document.getElementById("explanation").innerText;
-            const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "explanation.txt";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-        
-    </script>
 
     <!-- Include jsPDF if not already included -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
