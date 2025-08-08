@@ -1,36 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Topic Breakdown GPT</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<meta charset="UTF-8">
+<title>Topic Breakdown GPT</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Spinner Container */
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.circle {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #0077ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0077ff;
+    margin: 0 3px;
+    animation: bounce 1.2s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.24s; }
+.dot:nth-child(2) { animation-delay: -0.12s; }
+.dot:nth-child(3) { animation-delay: 0; }
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+.hidden {
+    display: none;
+}
 </style>
-
-
 </head>
 <body>
-    <h1>Want to breakdown a topic?</h1>
-    <form method="POST", class="ai-form">
-        <input type="text" name="topic" placeholder="Enter a topic..." class="input-text" required>
-    <label for="provider">Select AI Provider:</label>
-  <select name="provider" required>
-    <option value="openai" {% if provider == "openai" %}selected{% endif %}>OpenAI</option>
-    <option value="gemini" {% if provider == "gemini" %}selected{% endif %}>Gemini</option>
-    <option value="huggingface" {% if provider == "huggingface" %}selected{% endif %}>Hugging Face</option>
-  </select>
-        <button type="submit">Submit</button>
-    </form>
 
-    {% if explanation %}
-    <h2>Explanation:</h2>
-    <p id="explanation" class="glass">{{ explanation | safe }}</p>
-        {% endif %}
+<h1>Want to breakdown a topic?</h1>
+<form id="topic-form" class="ai-form">
+    <input type="text" id="topic-input" name="topic" placeholder="Enter a topic..." class="input-text" required>
+    <button type="submit">Submit</button>
+</form>
 
+<!-- Spinner -->
+<div id="spinner" class="spinner-container hidden">
+    <div class="circle">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+    <p id="spinner-text">Thinking...</p>
+</div>
 
+<!-- Topic Heading -->
+<h2 id="submitted-topic" style="display:none;"></h2>
 
-    <!-- Include jsPDF if not already included -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Explanation Section -->
+<p id="explanation" class="glass hidden">{{ explanation | safe }}</p>
+
+<script>
+const form = document.getElementById('topic-form');
+const topicInput = document.getElementById('topic-input');
+const submittedTopicDiv = document.getElementById('submitted-topic');
+const explanationDiv = document.getElementById('explanation');
+const spinner = document.getElementById('spinner');
+const spinnerText = document.getElementById('spinner-text');
+
+// Fun, formal, and creative synonyms for "Thinking..."
+const thinkingPhrases = [
+    "Thinking...",
+    "Analyzing...",
+    "Crunching the numbers...",
+    "Gathering ideas...",
+    "Consulting the archives...",
+    "Brewing up an answer...",
+    "Running the brain engine...",
+    "Mulling it over...",
+    "Piecing things together...",
+    "Cooking up some thoughts...",
+    "Fact-checking the universe...",
+    "Putting on my thinking cap...",
+    "Sharpening the pencils...",
+    "Drawing conclusions...",
+    "Turning cogs in the machine..."
+];
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const topic = topicInput.value;
+
+    // Randomize spinner text
+    spinnerText.textContent = thinkingPhrases[Math.floor(Math.random() * thinkingPhrases.length)];
+
+    // Show spinner, hide old results
+    spinner.classList.remove('hidden');
+    explanationDiv.classList.add('hidden');
+    submittedTopicDiv.style.display = 'none';
+    explanationDiv.innerHTML = '';
+
+    try {
+        const response = await fetch('/api/breakdown', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic: topic }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Fill in explanation and show results
+        explanationDiv.innerHTML = data.explanation;
+        explanationDiv.classList.remove('hidden');
+
+        submittedTopicDiv.innerHTML = `Breakdown for: <strong>${topic}</strong>`;
+        submittedTopicDiv.style.display = 'block';
+
+    } catch (error) {
+        console.error('Error:', error);
+        explanationDiv.innerHTML = '<p style="color:red;">An error occurred. Please try again.</p>';
+        explanationDiv.classList.remove('hidden');
+    } finally {
+        // Hide spinner
+        spinner.classList.add('hidden');
+    }
+});
+</script>
+
 </body>
 </html>

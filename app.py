@@ -1,32 +1,36 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, session
 from dotenv import load_dotenv
 import os
-import google.generativeai as genai
-import requests
-import openai
-import json
 import re
 from markupsafe import Markup
-import requests
+import google.generativeai as genai
 
-# Load environment variables from .env
+# Load environment variables
 load_dotenv()
-print("Hugging Face API Key:", os.getenv("HUGGINGFACE_API_KEY"))  # Debug print
-print(os.getenv("OPENAI_API_KEY"))
 
-# Initialize Flask app
+# Configure Gemini
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
-# Set up API keys
-openai.api_key = os.getenv("OPENAI_API_KEY")
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-huggingface_api_key = os.getenv("HUGGINGFACE_API_KEY")
-
+# Format function
 def format_explanation(raw_text):
+    # Bold formatting
     text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', raw_text)
+    
+    # Italics for markdown headings (# ...)
     text = re.sub(r'^\s*#+\s*(.*)', r'<em>\1</em>', text, flags=re.MULTILINE)
 
+    # Style lettered headers (A. Something)
+    text = re.sub(
+        r'^(?P<letter>[A-Z])\.\s+(?P<title>.+)$',
+        r'<div class="lettered-header">\g<letter>. \g<title></div>',
+        text,
+        flags=re.MULTILINE
+    )
+
+    # Lists
     lines = text.split('\n')
     formatted_lines = []
     in_list = False
@@ -34,7 +38,7 @@ def format_explanation(raw_text):
         if line.strip().startswith('- '):
             if not in_list:
                 formatted_lines.append('<ul>')
-                in_list = True
+            in_list = True
             formatted_lines.append(f"<li>{line.strip()[2:]}</li>")
         else:
             if in_list:
@@ -43,217 +47,99 @@ def format_explanation(raw_text):
             formatted_lines.append(line)
     if in_list:
         formatted_lines.append('</ul>')
+
     return Markup('\n'.join(formatted_lines))
 
-def query_huggingface(prompt, model="mistralai/Mistral-7B-Instruct-v0.1"):
-    api_url = f"https://api-inference.huggingface.co/models/{model}"
-    headers = {
-        "Authorization": f"Bearer {huggingface_api_key}",
-        "Content-Type": "application/json"
-    }
-    payload = {"inputs": prompt, "options": {"wait_for_model": True}}
 
-    response = requests.post(api_url, headers=headers, json=payload)
-
-    if response.status_code == 200:
-        try:
-            result = response.json()
-            if isinstance(result, list) and "generated_text" in result[0]:
-                return result[0]["generated_text"]
-            elif "generated_text" in result:
-                return result["generated_text"]
-            elif "output" in result:
-                return result["output"]
-            else:
-                return str(result)
-        except json.JSONDecodeError:
-            return "Error: Hugging Face response was not valid JSON."
-    else:
-        return f"Hugging Face error {response.status_code}: {response.text}"
-    
-# --- Explain function ---
-def explain_topic(topic, provider):
+# Only Gemini is used
+def explain_topic(topic):
+# ... (Your explain_topic function is fine) ...
     prompt = f"""
-        Break down the topic: "{topic}" as if you're teaching a complete beginner.
+    Break down the topic: "{topic}" as if you're teaching a complete beginner.
 
-        Organize the explanation using the following structure:
+    Organize the explanation using the following structure:
 
-        1. Market Research
-        - Target Audience
-        - Competition
-        - Trends
+        A. Market Research
+            1. Target Audience
+            2. Competition
+            3. Trends
 
-        2. Business Plan
-        - Goals and Objectives
-        - Budget
-        - Marketing Strategy
+        B. Business Plan
+            1. Goals and Objectives
+            2. Budget
+            3. Marketing Strategy
 
-        3. Legal Requirements
-        - Business Registration
-        - Taxation
-        - Insurance
+        C. Legal Requirements
+            1. Business Registration
+            2. Taxation
+            3. Insurance
 
-        4. Equipment and Supplies
-        - Necessary Tools
-        - Materials
-        - Software (if applicable)
+        D. Equipment and Supplies
+            1. Necessary Tools
+            2. Materials
+            3. Software (if applicable)
 
-        5. Production Process
-        - Step-by-step Overview
-        - Tools or Techniques
-        - Quality Control
-        - Packaging
+        E. Production Process
+            1. Step-by-step Overview
+            2. Tools or Techniques
+            3. Quality Control
+            4. Packaging
 
-        6. Product Range
-        - Types of Products or Services
-        - Customization Options
-        - Bundling or Packages
+        F. Product Range
+            1. Types of Products or Services
+            2. Customization Options
+            3. Bundling or Packages
 
-        7. Pricing Strategy
-        - Cost Analysis
-        - Competitive Pricing
-        - Promotions and Discounts
+        G. Pricing Strategy
+            1. Cost Analysis
+            2. Competitive Pricing
+            2. Promotions and Discounts
 
-        8. Marketing and Sales
-        - Online Presence
-        - Social Media Strategy
-        - Offline Marketing
-        - Partnerships
+        H. Marketing and Sales
+            1. Online Presence
+            2. Social Media Strategy
+            3. Offline Marketing
+            4. Partnerships
 
-        9. Customer Service
-        - Communication
-        - Feedback Collection
-        - After-sales Support
+        I. Customer Service
+            1. Communication
+            2. Feedback Collection
+            3. After-sales Support
 
-        10. Growth and Expansion
-            - New Product Ideas
-            - Scaling Strategies
-            - Diversification Opportunities
+        J. Growth and Expansion
+            1. New Product Ideas
+            2. Scaling Strategies
+            3. Diversification Opportunities
 
-        End with a short summary of what it takes to succeed in this business or field
+        End with a short summary of what it takes to succeed in this business or field.
         """
-    if provider == "huggingface":
-        try:
-            import json
 
-            api_url = "https://api-inference.huggingface.co/models/bigscience/bloomz-560m"
-            headers = {
-                "Authorization": f"Bearer {huggingface_api_key}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "inputs": f"Explain the topic: {topic}",
-                "options": {"wait_for_model": True}
-            }
-
-            response = requests.post(api_url, headers=headers, json=payload)
-
-            # Check if response is OK
-            if response.status_code != 200:
-                return f"HuggingFace error: {response.status_code} - {response.text}"
-
-            # Try decoding JSON response
-            try:
-                result = response.json()
-            except json.JSONDecodeError:
-                return "Error: Unable to decode response from HuggingFace."
-
-            # Extract generated text safely
-            if isinstance(result, list) and "generated_text" in result[0]:
-                return result[0]["generated_text"]
-            else:
-                return f"HuggingFace API returned unexpected format: {result}"
-
-        except Exception as e:
-            return f"Unexpected HuggingFace error: {str(e)}"
-    
-    elif provider == "gemini":
-        try:
-            genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-            
-            model = genai.GenerativeModel("gemini-1.5-flash-latest")
-            response = model.generate_content(prompt)
-            
-            return response.text  
-
-        except Exception as e:
-            return f"Gemini error: {str(e)}"
-
-
-    elif provider == "openai":
-        try:
-            # Use openai.ChatCompletion directly
-            response = openai.ChatCompletion.create(
-                model=os.getenv("OPENAI_MODEL", "gpt-4o"),  # fallback to gpt-4o
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=2000
-            )
-
-            return response.choices[0].message["content"]
-
-        except Exception as e:
-            return f"OpenAI SDK error: {str(e)}"
-
-        except Exception as e:
-            return f"OpenAI SDK error: {str(e)}"
-
-def get_breakdown(topic):
     try:
-        # 1. Try OpenAI GPT-4
-        openai_response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": f"Break down the topic '{topic}' in a structured and organized way. Use headings and bullet points. Make it beginner-friendly."}
-            ]
-        )
-        return openai_response.choices[0].message.content
+        model = genai.GenerativeModel("gemini-1.5-flash-latest")
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"Gemini error: {str(e)}"
 
-    except Exception as e_openai:
-        print("OpenAI failed:", e_openai)
-
-        try:
-            # 2. Fallback to Gemini (Google Generative AI)
-            gemini_prompt = f"Break down the topic '{topic}' in a structured and organized way. Use headings and bullet points. Make it beginner-friendly."
-            gemini_response = genai.chat(messages=[gemini_prompt])
-            return gemini_response.last
-
-        except Exception as e_gemini:
-            print("Gemini failed:", e_gemini)
-            return "Sorry, all AI providers are currently unavailable. Please try again later."
-
-# --- Routes ---
-@app.route("/", methods=["GET", "POST"])
+# Route for the initial page load (GET request)
+@app.route("/", methods=["GET"])
 def index():
-    if request.method == "POST":
-        topic = request.form["topic"]
-        provider = request.form["provider"]
+    return render_template("index.html")
 
-        print("Selected provider:", provider)
-        print("Topic entered:", topic)
-
-        raw_explanation = explain_topic(topic, provider)
-        explanation = format_explanation(raw_explanation)
-
-        # Always update the session with new values
-        session["explanation"] = str(explanation)
-        session["topic"] = topic
-        session["provider"] = provider
-
-        return redirect(url_for("index"))
-
-    # GET request (initial or after POST redirect)
-    topic = session.get("topic", "")
-    provider = session.get("provider", "")
-    explanation = session.get("explanation", "")
-
-    return render_template("index.html", topic=topic, provider=provider, explanation=explanation)
+# New API route to handle AJAX POST requests
+@app.route("/api/breakdown", methods=["POST"])
+def api_breakdown():
+    data = request.json
+    topic = data.get("topic")
+    
+    if not topic:
+        return jsonify({"error": "Topic is required"}), 400
+    
+    raw_explanation = explain_topic(topic)
+    explanation = str(format_explanation(raw_explanation))
+    
+    return jsonify({"explanation": explanation})
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
