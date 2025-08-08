@@ -5,7 +5,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: radial-gradient(circle at center, #f8e2d4 0%, #d4e2f8 100%);
+    background: radial-gradient(circle at center, #fdf2e9 0%, #e6ecf9 100%);
+    background-attachment: fixed;
     overflow: auto;
     position: relative;
     opacity: 0;
@@ -262,9 +263,21 @@ input::placeholder {
 }
 
 .lettered-header {
-    font-size: 1.3em; /* Bigger font */
-    font-weight: bold;
-    color: #0056b3; /* Example: deep blue */
-    margin-top: 10px;
-    margin-bottom: 5px;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #0056b3;
+  position: relative;
 }
+
+.lettered-header::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: #4CAF50;
+  border-radius: 3px;
+}
+
+

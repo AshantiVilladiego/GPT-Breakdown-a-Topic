@@ -53,7 +53,6 @@ def format_explanation(raw_text):
 
 # Only Gemini is used
 def explain_topic(topic):
-# ... (Your explain_topic function is fine) ...
     prompt = f"""
     Break down the topic: "{topic}" as if you're teaching a complete beginner.
 
@@ -115,7 +114,7 @@ def explain_topic(topic):
         """
 
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash-latest")
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
