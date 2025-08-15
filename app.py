@@ -82,9 +82,10 @@ def explain_topic(topic):
             3. **Software/Tools**: Use appropriate digital or physical tools to design, manage, and deliver offerings.
 
             ### Production Process
-            1. **Designing/Planning**: Develop clear, functional, and appealing concepts for your offerings.
-            2. **Production/Execution**: Create products or deliver services with precision and consistency.
-            3. **Finishing/Delivery**: Complete, package, and deliver the final output to the customer.
+            1. **Designing**: Develop appealing and functional product designs.
+            2. **Printing**: Produce items with consistent quality and accuracy.
+            3. **Cutting**: Prepare products to precise shapes and sizes.
+            4. **Packaging**: Package products securely and attractively.
 
             ### Product/Service Range
             1. **Custom Offerings**: Provide tailored options that meet specific client needs.
