@@ -54,65 +54,67 @@ def format_explanation(raw_text):
 # Only Gemini is used
 def explain_topic(topic):
     prompt = f"""
-    Break down the topic: "{topic}" as if you're teaching a complete beginner.
+            Generate a business guide for {topic}.  
+            The guide should follow this exact structure, with each subtopic written in one sentence only — short, concise, but knowledgeable.  
+            Do not include specific examples unless they are generic to the business type in the prompt.  
+            For the "Primary Equipment" line, automatically adapt it to the main equipment relevant to the business type.
 
-    Organize the explanation using the following structure:
+            {topic} is a versatile and profitable business. Here’s a breakdown of the key aspects involved in starting and running a {topic} business.
 
-        A. Market Research
-            1. Target Audience
-            2. Competition
-            3. Trends
+            ### Market Research
+            1. **Target Audience**: Identify your primary customers.
+            2. **Competition**: Analyze the strengths and weaknesses of other businesses in the market.
+            3. **Trends**: Stay updated on current and emerging industry trends.
 
-        B. Business Plan
-            1. Goals and Objectives
-            2. Budget
-            3. Marketing Strategy
+            ### Business Plan
+            1. **Goals and Objectives**: Define clear and measurable business goals.
+            2. **Budget**: Outline all startup, operational, and projected revenue figures.
+            3. **Marketing Strategy**: Develop a plan for promoting and positioning your business.
 
-        C. Legal Requirements
-            1. Business Registration
-            2. Taxation
-            3. Insurance
+            ### Legal Requirements
+            1. **Business Registration**: Register your business and comply with all legal formalities.
+            2. **Taxation**: Understand and fulfill your business’s tax obligations.
+            3. **Insurance**: Secure insurance coverage to mitigate potential risks.
 
-        D. Equipment and Supplies
-            1. Necessary Tools
-            2. Materials
-            3. Software (if applicable)
+            ### Equipment and Supplies
+            1. **Primary Equipment**: Acquire [insert main equipment relevant to the business type] suited for professional production.
+            2. **Materials**: Source high-quality materials necessary for creating your products or services.
+            3. **Software/Tools**: Use appropriate digital or physical tools to design, manage, and deliver offerings.
 
-        E. Production Process
-            1. Step-by-step Overview
-            2. Tools or Techniques
-            3. Quality Control
-            4. Packaging
+            ### Production Process
+            1. **Designing/Planning**: Develop clear, functional, and appealing concepts for your offerings.
+            2. **Production/Execution**: Create products or deliver services with precision and consistency.
+            3. **Finishing/Delivery**: Complete, package, and deliver the final output to the customer.
 
-        F. Product Range
-            1. Types of Products or Services
-            2. Customization Options
-            3. Bundling or Packages
+            ### Product/Service Range
+            1. **Custom Offerings**: Provide tailored options that meet specific client needs.
+            2. **Standard Offerings**: Offer ready-made solutions for general use.
+            3. **Bundles/Packages**: Create grouped offerings or deals to increase sales value.
 
-        G. Pricing Strategy
-            1. Cost Analysis
-            2. Competitive Pricing
-            2. Promotions and Discounts
+            ### Pricing Strategy
+            1. **Cost Analysis**: Set prices based on accurate cost and profit calculations.
+            2. **Competitive Pricing**: Align pricing with industry benchmarks.
+            3. **Discounts and Packages**: Offer incentives to encourage higher-volume purchases.
 
-        H. Marketing and Sales
-            1. Online Presence
-            2. Social Media Strategy
-            3. Offline Marketing
-            4. Partnerships
+            ### Marketing and Sales
+            1. **Online Presence**: Maintain a professional digital platform to promote and sell.
+            2. **Social Media**: Use online channels to build awareness and engagement.
+            3. **Local Marketing**: Apply offline strategies to reach nearby customers.
+            4. **Collaborations**: Partner with others to expand your reach and credibility.
 
-        I. Customer Service
-            1. Communication
-            2. Feedback Collection
-            3. After-sales Support
+            ### Customer Service
+            1. **Communication**: Ensure clear, professional, and responsive interaction with customers.
+            2. **Feedback**: Collect and apply customer feedback to improve.
+            3. **After-sales Support**: Offer ongoing assistance after the sale.
 
-        J. Growth and Expansion
-            1. New Product Ideas
-            2. Scaling Strategies
-            3. Diversification Opportunities
+            ### Growth and Expansion
+            1. **New Offerings**: Continuously develop fresh products or services.
+            2. **Wholesale/Scaling**: Expand operations to reach larger markets.
+            3. **Diversification**: Enter related markets or introduce complementary offerings.
 
-        End with a short summary of what it takes to succeed in this business or field.
-        """
+            Starting a {topic} involves thorough planning, creativity, and dedication. By focusing on quality, customer satisfaction, and effective marketing, you can build a successful and sustainable business.
 
+            """
     try:
         model = genai.GenerativeModel("gemini-2.0-flash-lite")
         response = model.generate_content(prompt)
